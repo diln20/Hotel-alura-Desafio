@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/andre_hk4s7fk/Downloads/c3p0-0.9.5.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/andre_hk4s7fk/Downloads/jcalendar-1.4/lib/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/andre_hk4s7fk/Downloads/mchange-commons-java-0.2.20.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/MySQL/Connector ODBC 8.1/mysql-connector-j-8.1.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
