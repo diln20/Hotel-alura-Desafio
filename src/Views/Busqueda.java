@@ -29,6 +29,7 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -666,12 +667,16 @@ public class Busqueda extends JFrame {
                 huesped.getIdReserva()
             });
         }
+        
         for (ReservasVO reserva : listaReservas) {
+             double valor = reserva.getValor();
+            DecimalFormat decimalFormat = new DecimalFormat("#,###,##0.0");
+            String valorFormateado = decimalFormat.format(valor);
             modelo.addRow(new Object[]{
                 reserva.getId(),
                 reserva.getFechaEntrada(),
                 reserva.getFechaSalida(),
-                reserva.getValor(),
+                valorFormateado,
                 reserva.getFormaPago(),});
         }
     }
@@ -723,12 +728,15 @@ public class Busqueda extends JFrame {
                         Integer id_r = Integer.valueOf(id_Str);
                         LocalDate fechaEntrada = LocalDate.parse(modelo.getValueAt(tbReservas.getSelectedRow(), 1).toString());
                         LocalDate fechaSalida = LocalDate.parse(modelo.getValueAt(tbReservas.getSelectedRow(), 2).toString());
-                        String valorStr = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 3);
-                        double valor = Double.parseDouble(valorStr);
+                        String valorConPuntosYComa = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 3);
+
+                        // Elimina los caracteres no numéricos, es decir, el punto y la coma
+                        String valorSinPuntosNiComa = valorConPuntosYComa.replaceAll("[.,]", "");
+                         double valorDouble = Double.parseDouble(valorSinPuntosNiComa);
                         String formaPago = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 4);
                         reservasVO.setFechaEntrada(fechaEntrada);
                         reservasVO.setFechaSalida(fechaSalida);
-                        reservasVO.setValor(valor);
+                        reservasVO.setValor(valorDouble);
                         reservasVO.setFormaPago(formaPago);
                         reservasVO.setId(id_r);
                         int result = fachadHotel.actualizarReserva(reservasVO);

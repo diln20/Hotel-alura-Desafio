@@ -1,5 +1,6 @@
 package com.alura.dao;
 
+import com.alura.conexionFactory.ConnectionFactory;
 import com.alura.vo.HuespedVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +24,8 @@ public class HuespedDAO {
 
     public List<HuespedVO> listar(HuespedVO huespedVO) {
         List<HuespedVO> resultado = new ArrayList<>();
+        ConnectionFactory factory = new ConnectionFactory();
+        final Connection con = factory.recuperaConexion();
 
         try (con) {
             StringBuilder queryBuilder = new StringBuilder("SELECT id, Nombre, Apellido, FechaNacimiento, Nacionalidad, Telefono, idReserva FROM hotelalura.huespedes");
@@ -110,6 +113,8 @@ public class HuespedDAO {
     }
 
     public boolean guardar(HuespedVO huespedVO, int idReserva) {
+        ConnectionFactory factory = new ConnectionFactory();
+        final Connection con = factory.recuperaConexion();
         boolean resultado = false;
         try (con) {
 
@@ -146,9 +151,14 @@ public class HuespedDAO {
         System.out.println("rs" + resultado);
         return resultado;
     }
+    
+    
 
-    public int actualizar(Object obj) {
-        HuespedVO huespedVO = (HuespedVO) obj;
+    
+    public int actualizar(Object obj) throws SQLException {
+        ConnectionFactory factory = new ConnectionFactory();
+        HuespedVO huespedVO=(HuespedVO)obj;
+        final Connection con = factory.recuperaConexion();
         try {
             final PreparedStatement statement = con.prepareStatement(
                     "UPDATE hotelalura.huespedes SET "
@@ -161,7 +171,7 @@ public class HuespedDAO {
                     + " WHERE ID           = ?");
 
             try (statement) {
-
+                
                 statement.setString(1, huespedVO.getNombre());
                 statement.setString(2, huespedVO.getApellido());
                 statement.setDate(3, java.sql.Date.valueOf(huespedVO.getFechaNacimiento()));
@@ -177,10 +187,16 @@ public class HuespedDAO {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally{
+            con.close();
         }
     }
 
+    
+    
     public int eliminar(Integer id) {
+        ConnectionFactory factory = new ConnectionFactory();
+        final Connection con = factory.recuperaConexion();
         try {
             final PreparedStatement statement = con.prepareStatement("DELETE FROM hotelalura.huespedes WHERE id = ?");
 
@@ -190,13 +206,15 @@ public class HuespedDAO {
                 int updateCount = statement.getUpdateCount();
                 return updateCount;
 
+
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
+    
+    
     public void cerrarConexion() {
         try {
             if (con != null) {

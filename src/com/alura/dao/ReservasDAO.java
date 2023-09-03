@@ -1,6 +1,8 @@
 package com.alura.dao;
 
 import com.alura.conexionFactory.ConnectionFactory;
+import com.alura.vo.HuespedVO;
+import com.alura.vo.ReservasVO;
 import com.alura.vo.ReservasVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**

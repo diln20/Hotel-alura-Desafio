@@ -22,6 +22,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import javax.swing.JSeparator;
@@ -43,12 +45,13 @@ public class ReservasView extends JFrame {
 
     /**
      * Launch the application.
+     *
      * @param args
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                if (UserSession.getLoggedInUser()!=null) {
+                if (UserSession.getLoggedInUser() != null) {
                     ReservasView frame = new ReservasView();
                     frame.setVisible(true);
                 }
@@ -269,18 +272,39 @@ public class ReservasView extends JFrame {
         txtFechaSalida.setFont(new Font("Roboto", Font.PLAIN, 18));
         txtFechaSalida.addPropertyChangeListener((PropertyChangeEvent evt) -> {
             //Activa el evento, después del usuario seleccionar las fechas se debe calcular el valor de la reserva
-            
+
             if (txtFechaSalida.getDate() != null && txtFechaEntrada.getDate() != null) {
                 Calendar fechaSalida = txtFechaSalida.getCalendar();
                 Calendar fechaEntrada = txtFechaEntrada.getCalendar();
-                
-                reservaVO.setFechaSalida(fechaSalida.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                reservaVO.setFechaEntrada(fechaEntrada.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                
-                int valor = reservaVO.calcularCantidadDias(reservaVO.getFechaSalida(), reservaVO.getFechaEntrada());
-                txtValor.setText(String.valueOf(valor));
-                reservaVO.setValor(Double.parseDouble(txtValor.getText()));
-                //System.out.println("resValor"+reservaVO.getValor());
+
+                LocalDate fechaSalidaLocal = fechaSalida.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate fechaEntradaLocal = fechaEntrada.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if (fechaSalidaLocal.isBefore(fechaEntradaLocal)) {
+                    // Mostrar un cuadro de diálogo de advertencia
+                    JOptionPane.showMessageDialog(null, "La fecha de salida debe ser mayor o igual a la fecha de salida.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (fechaEntradaLocal.isAfter(fechaSalidaLocal)) {
+                    // Mostrar un cuadro de diálogo de advertencia
+                    JOptionPane.showMessageDialog(null, "La fecha de entrada debe ser menor o igual a la fecha de salida.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    int dias = reservaVO.calcularCantidadDias(fechaSalidaLocal, fechaEntradaLocal);
+                    double valor = dias * 45000.0;
+
+                    if (valor != 0) {
+                        DecimalFormat decimalFormat = new DecimalFormat("$ #,###,##0.0");
+                        String valorFormateado = decimalFormat.format(valor);
+                        txtValor.setText(valorFormateado);
+                    } else {
+                        valor = 45000.0;
+                        DecimalFormat decimalFormat = new DecimalFormat("$ #,###,##0.0");
+                        String valorFormateado = decimalFormat.format(valor);
+                        txtValor.setText(valorFormateado);
+                    }
+
+                    reservaVO.setFechaSalida(fechaSalidaLocal);
+                    reservaVO.setFechaEntrada(fechaEntradaLocal);
+                    reservaVO.setValor(valor);
+                }
+
             }
         });
 
@@ -293,7 +317,7 @@ public class ReservasView extends JFrame {
         txtValor.setBackground(SystemColor.text);
         txtValor.setHorizontalAlignment(SwingConstants.CENTER);
         txtValor.setForeground(Color.BLACK);
-        txtValor.setBounds(78, 328, 43, 33);
+        txtValor.setBounds(78, 328, 150, 33);
         txtValor.setEditable(false);
         txtValor.setFont(new Font("Roboto Black", Font.BOLD, 17));
         txtValor.setBorder(javax.swing.BorderFactory.createEmptyBorder());
